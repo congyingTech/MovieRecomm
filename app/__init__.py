@@ -20,4 +20,9 @@ def createApp(config_name):
     mail.init_app(app)
     moment.init_app(app)
     db.init_app(app)
+
+    #注册蓝本main——这样main中的路由和错误处理程序便注册到了app上
+    from .main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+
     return app
