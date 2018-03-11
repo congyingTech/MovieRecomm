@@ -13,12 +13,12 @@ class Config:
     FLASKY_MAIL_SUBJECT_PREFIX = '[MovieRecomm]'
     FLASKY_MAIL_SENDER = 'movieRecomm<???>'
 
-'''
-配置定义init_app的方法对当前环境配置初始化，参数是程序实例
-'''
-@staticmethod
-def init_app(app):
-    pass
+    '''
+    配置定义init_app的方法对当前环境配置初始化，参数是程序实例
+    '''
+    @staticmethod
+    def init_app(app):
+        pass
 
 '''
 继承父类Config的开发环境配置

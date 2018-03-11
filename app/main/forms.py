@@ -1,8 +1,8 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
-from wtforms.validators import  Required
+from wtforms.validators import DataRequired
 
 #表单类
-class NameForm(Form):
-    name = StringField('输入你的名字', validators=[Required()])
+class NameForm(FlaskForm):
+    name = StringField('输入你的名字', validators=[DataRequired()])
     submit = SubmitField('提交')
