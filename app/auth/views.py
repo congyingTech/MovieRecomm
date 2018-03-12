@@ -35,7 +35,7 @@ def secret():
 
 
 #注册之后跳转到登录页面，跳转这种只在views层进行逻辑的操作
-@auth.route('/register',methods=['POST', 'GET'])
+@auth.route('/register', methods=['GET','POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
