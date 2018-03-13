@@ -39,7 +39,10 @@ def secret():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data, username=form.username.data,password=form.password.data)
+        moviePrefer = str(form.moviePrefer.data)
+        print(moviePrefer)
+        print(type(moviePrefer))
+        user = User(email=form.email.data, username=form.username.data,password=form.password.data, moviePrefer=moviePrefer)
         db.session.add(user)
         flash('You can login now.')
         return redirect(url_for('auth.login'))

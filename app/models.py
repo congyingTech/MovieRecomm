@@ -1,6 +1,7 @@
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from flask import url_for
 
 
 class User(UserMixin, db.Model):
@@ -9,8 +10,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128)) #经过散列的密码
+    moviePrefer = db.Column(db.Text(64)) #这是注册用户时需要添加的电影偏好标签
 
-    movieContent = db.Column(db.Text()) #这是注册用户下的电影信息
+    #movieContent = db.Column(db.Text()) #这是注册用户下的电影信息
 
 
     def __repr__(self):
@@ -32,3 +34,41 @@ class User(UserMixin, db.Model):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
+
+
+#所有爬取Film表单
+class Film(db.Model):
+    __tablename__ = 'film'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    datatime = db.Column(db.Text, nullable=False)
+    title = db.Column(db.Text, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    create_time = db.Column(db.Text, nullable=False)
+    cover_url = db.Column(db.Text, nullable=False)
+    download_url = db.Column(db.Text, nullable=False)
+
+
+#
+class UserMovie(db.Model):
+    __tablename__ = 'usermovies'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    body_html = db.Column(db.Text)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def to_json(self):
+        json_post = {
+            'url': url_for('api.get_post', id=self.id),
+            'body': self.body,
+            'body_html': self.body_html,
+            'author_url': url_for('api.get_user', id=self.author_id),
+        }
+        return json_post
+
+    @staticmethod
+    def from_json(json_post):
+        body = json_post.get('body')
+        if body is None or body == '':
+            print('post does not have a body')
+        return UserMovie(body=body)
+

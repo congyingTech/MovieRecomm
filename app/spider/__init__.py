@@ -1,3 +1,3 @@
 from flask import Blueprint
-content = Blueprint('content', __name__)
+spider = Blueprint('spider', __name__)
 from . import views
