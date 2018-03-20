@@ -38,9 +38,8 @@ class User(UserMixin, db.Model):
 
 #所有爬取Film表单
 class Film(db.Model):
-    __tablename__ = 'film'
+    __tablename__ = 'films'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    datatime = db.Column(db.Text, nullable=False)
     title = db.Column(db.Text, nullable=False)
     content = db.Column(db.Text, nullable=False)
     create_time = db.Column(db.Text, nullable=False)
@@ -48,7 +47,7 @@ class Film(db.Model):
     download_url = db.Column(db.Text, nullable=False)
 
 
-#
+#用户信息表单
 class UserMovie(db.Model):
     __tablename__ = 'usermovies'
     id = db.Column(db.Integer, primary_key=True)
