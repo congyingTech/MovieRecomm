@@ -36,18 +36,23 @@ class User(UserMixin, db.Model):
         return User.query.get(int(user_id))
 
 
-#所有爬取Film表单
+#所有爬取Film的数据库表
 class Film(db.Model):
     __tablename__ = 'films'
+    #title,rate,url,cover_url,types,actors,content,create_time
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.Text, nullable=False)
+    rate = db.Column(db.String, nullable=False)
+    url = db.Column(db.String, nullable=False)
+    cover_url = db.Column(db.String, nullable=False)
+    types = db.Column(db.String, nullable=False)
+    actors = db.Column(db.String, nullable=False)
     content = db.Column(db.Text, nullable=False)
-    create_time = db.Column(db.Text, nullable=False)
-    cover_url = db.Column(db.Text, nullable=False)
-    download_url = db.Column(db.Text, nullable=False)
+    create_time = db.Column(db.String, nullable=False)
 
 
-#用户信息表单
+
+#用户信息数据库表
 class UserMovie(db.Model):
     __tablename__ = 'usermovies'
     id = db.Column(db.Integer, primary_key=True)

@@ -39,7 +39,7 @@ def secret():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        moviePrefer = str(form.moviePrefer.data)
+        moviePrefer = str(form.moviePrefer.data)#sqlite不能存储list数据，只能统一变成str格式
         print(moviePrefer)
         print(type(moviePrefer))
         user = User(email=form.email.data, username=form.username.data,password=form.password.data, moviePrefer=moviePrefer)
