@@ -3,12 +3,13 @@ from lxml import etree
 from multiprocessing.dummy import Pool as ThreadPool
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'}
 import sqlite3
+import re
 '''
 因为有355页的数据，所以采用多线程爬虫
 '''
 def main():
     base_url = 'http://www.kaixindy.com/category/video/page/'
-    url_lists = [base_url+str(i) for i in range(355)]
+    url_lists = [base_url+str(i) for i in range(1)]
     pool = ThreadPool()
     results = pool.map(one_page, url_lists)
     pool.close()
@@ -64,10 +65,10 @@ def spider_page(url):
 
     #电影的内容
     content = tree.xpath('//div[@id="content"]/div/div/p/text()')
-    for item in content:
-        if len(item) == 0:
-            item = tree.xpath('//div[@id="content"]/div/div/div/p/text()')
 
+    #豆瓣评分
+    rank = tree.xpath('//div[@id="content"]/div/div/p[starts-with(text(),"豆瓣评分")]')
+    print(rank)
     #创建时间
     create_time = tree.xpath('//span[@class="post-info-date"]/text()')
 
@@ -81,10 +82,11 @@ def spider_page(url):
     else:
         movie['title'] = 'Nan'
     if len(content)>0:
-        movie['content'] = ','.join(content)
+        movie['content'] = re.sub('[\r\n\t◎]', '|', ''.join(content))
+        print(movie['content'])
     else:
         movie['content'] = 'Nan'
-    if len('content')>0:
+    if len(create_time)>0:
         movie['create_time'] = create_time[0].strip()
     else:
         movie['create_time'] = 'Nan'
@@ -98,7 +100,7 @@ def spider_page(url):
     else:
         movie['cover_url'] = 'Nan'
 
-    save_data(movie)
+    #save_data(movie)
 
     return movie
 

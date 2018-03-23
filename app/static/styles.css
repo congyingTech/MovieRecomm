@@ -130,23 +130,29 @@ ul li{
     border-radius: 50%;
 }
 
-.question-group{
-    float: left;
-    width: 660px;
-    margin-right: 10px;
+
+.introduce{width:1000px; height:270px; margin:0 auto}
+
+.introduce-l{width:594px; height:270px; margin:20px 30px 30px 20px; float:left}
+
+.introduce-r{float:right;}
+
+.introduce-r h3{padding-top:10px;}
+
+.introduce-r p,span{height:55px; line-height:22px; width:286px; font-size:14px;}
+
+.movie-all {
+    display: flex;
+    flex-direction: row;
+    /*border: 1px solid blue;*/
 }
-
-.question-title a{
-    color: #259;
-    font-weight: 900;
-    margin-left: 10px;
-
+.img-all {
+    /*width: 20%;*/
+    margin: 20px;
+    /*border: 1px solid red;*/
 }
-
-.question-info{
-    text-align: right;
-}
-
-.question-info .question-author{
-    margin-right: 20px;
+.text-all {
+    /*border: 1px solid green;*/
+    margin: 10px;
+    padding: 10px;
 }

@@ -1,10 +1,50 @@
 import requests
 from lxml import etree
 from multiprocessing.dummy import Pool as ThreadPool
-headers = {"User-Agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"}
 import sqlite3
-import re,json,logging
+import re,json,logging,random
 from urllib.parse import urlencode
+from urllib.request import ProxyHandler, build_opener
+
+
+# proxys = [{"http" : "110.73.50.119:8123"},
+#             {"http" : "117.90.1.251:9000"},
+#             {"http" : "115.223.231.69:9000"},
+#             {"http" : "115.223.215.229:9000"},
+#             {"http" : "218.95.51.46:9000"}]
+
+# Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+# Accept-Encoding: gzip, deflate, br
+# Accept-Language: zh-CN,zh;q=0.9
+# Cache-Control: max-age=0
+# Connection: keep-alive
+# Cookie: gr_user_id=9b25012a-368b-4cae-83f3-64f354dea4e3; __yadk_uid=AbvC7FbybsNL12s1aJWph6pmLcOxjoId; _ga=GA1.2.38940058.1482233398; ll="108288"; ue="bupt_wcy@163.com"; _vwo_uuid_v2=7909A73FF60DCF86621E6F0076C2F484|35bed231f1a504e0015873dc743eeac6; bid=XXpemV2uN_o; push_noty_num=0; push_doumail_num=0; viewed="10594787_1051193_2154960_1011228_26902009_26886337_24703171_2230244_1882382_1274001"; ap=1; __utmv=30149280.13901; ps=y; __utmz=30149280.1521600809.15.11.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; ct=y; __utmc=30149280; __utma=30149280.38940058.1482233398.1521683655.1521689851.21; __utma=223695111.1420860989.1482233398.1521627913.1521689855.67; __utmb=223695111.0.10.1521689855; __utmc=223695111; __utmz=223695111.1521689855.67.48.utmcsr=douban.com|utmccn=(referral)|utmcmd=referral|utmcct=/note/185257401/; _pk_ref.100001.4cf6=%5B%22%22%2C%22%22%2C1521689855%2C%22https%3A%2F%2Fwww.douban.com%2Fnote%2F185257401%2F%22%5D; _pk_ses.100001.4cf6=*; as="https://movie.douban.com/"; __utmt=1; regpop=1; __utmt_douban=1; _pk_id.100001.4cf6=9d8748bcfa17b8a1.1482233399.69.1521690826.1521628245.; __utmb=30149280.12.10.1521689851
+# Host: movie.douban.com
+# Referer: https://movie.douban.com/
+# Upgrade-Insecure-Requests: 1
+# User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36
+
+
+headers = {'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/4E423F',
+           'Referer': 'https://movie.douban.com/',
+           'Connection': 'keep-alive',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'zh-CN,zh;q=0.9'
+           }
+
+
+
+
+
+#headers = ("User-Agent","Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36")
+# proxy = random.choice(proxys)
+# print(proxy)
+#urllib使用代理
+# proxy_support = ProxyHandler(proxy)
+# opener = build_opener(proxy_support)
+# opener.addheaders = [headers]
+
 
 '''
 因为有355页的数据，所以采用多线程爬虫
@@ -61,8 +101,10 @@ def save_data(film):
     with sqlite3.connect("data-dev.sqlite") as conn:
         cursor = conn.cursor()
         # 插入数据
-        insert_sql = "insert into films(title,rate,url,cover_url,types,actors,content,create_time) values(\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\')"
-        cursor.execute(insert_sql % (title,rate,url,cover_url,types,actors,content,create_time))
+        insert_sql = "insert into films(title,rate,url,cover_url,types,actors,content,create_time) values('%s','%s','%s','%s','%s','%s','%s','%s')"
+        sql = insert_sql % (title,rate,url,cover_url,types,actors.replace("'","''"),content.replace("'","''"),create_time)
+        print(sql)
+        cursor.execute(sql)
         #cursor.execute("insert into films(title,create_time,content,cover_url,download_url) values('title', 'create_time', 'content', 'cover_url', 'download_url')")
         conn.commit()
 
@@ -75,8 +117,11 @@ def save_data(film):
 
 def one_page(url):
     onePageList = []
+    #
     response = requests.get(url, headers=headers)
     html = response.text
+    #r = opener.open(url)
+    #html = r.read().decode('utf-8')
     movie = json.loads(html)
     result = []
     if movie and 'subjects' in movie.keys():
@@ -101,8 +146,11 @@ def one_page(url):
 
 
 def spider_page(url):
+    #r = opener.open(url)
+    #html = r.read().decode('utf-8')
+
     response = requests.get(url, headers=headers)
-    html = response.text.encode('utf-8')
+    html = response.text
     tree = etree.HTML(html)
 
     #电影的内容
@@ -123,6 +171,7 @@ def spider_page(url):
 
 
 if __name__ == "__main__":
+    main()
     # maxPage = 355
     # for i in range(maxPage):
     #     main('http://www.kaixindy.com/category/video/page/%d'%i)
@@ -144,5 +193,52 @@ if __name__ == "__main__":
     #
     # print(content)
     # print(tree.xpath('//span[@property="v:initialReleaseDate"]/text()'))
+   #  proxies = {"http": "110.73.50.119:8123",
+   #             "http": "117.90.1.251:9000",
+   #             "http": "115.223.231.69:9000",
+   #             "http": "115.223.215.229:9000",
+   #             "http": "218.95.51.46:9000"}
 
-    main()
+    # url = 'https://movie.douban.com/subject/26862829/'
+    # response = requests.get(url, headers=headers)
+    # html = response.text.encode('utf-8')
+    # tree = etree.HTML(html)
+    # # 电影的内容
+    # content = re.sub('[\r\n\t]', '', ''.join(tree.xpath('//span[@property="v:summary"]/text()')))
+    # print(content)
+    # # 电影的类型
+    # types = ','.join(tree.xpath('//*[@id="info"]/span[@property="v:genre"]/text()'))
+    # print(types)
+    # # 电影的演员
+    # actors = ','.join(tree.xpath('//*[@id="info"]/span[@class="actor"]/span[@class="attrs"]/a[@href]/text()'))
+    # print(actors)
+    # # 上映时间
+    # create_time = '|'.join(tree.xpath('//span[@property="v:initialReleaseDate"]/text()'))
+    # print(create_time)
+    # headerss = ("User-Agent","Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36")
+    # proxy = random.choice(proxys)
+    # url = 'https://movie.douban.com/subject/25790761/'
+    #
+    # print(proxy)
+    # #urllib使用代理
+    # proxy_support = ProxyHandler(proxy)
+    # opener = build_opener(proxy_support)
+    # opener.addheaders = [headerss]
+    #
+    # r = opener.open(url)
+    # html = r.read().decode('utf-8')
+
+    #print(html)
+    # ip = ["110.73.50.119:8123","117.90.1.251:9000","115.223.231.69:9000","115.223.215.229:9000"]
+    # proxies = {"http":random.choice(ip)}
+    # proxy = {'http': '27.24.158.155:84'}
+    # print(proxies)
+    # url = 'http://ip.chinaz.com/'
+    # headers = {
+    #     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.103 Safari/537.36',
+    #     'Connection': 'keep-alive'}
+    # response = requests.get(url=url, proxies=proxy, headers=headers)
+    # response.encoding = 'utf-8'
+    # html = response.text
+    # print(html)
+

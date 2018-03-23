@@ -41,14 +41,14 @@ class Film(db.Model):
     __tablename__ = 'films'
     #title,rate,url,cover_url,types,actors,content,create_time
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.Text, nullable=False)
-    rate = db.Column(db.String, nullable=False)
-    url = db.Column(db.String, nullable=False)
-    cover_url = db.Column(db.String, nullable=False)
-    types = db.Column(db.String, nullable=False)
-    actors = db.Column(db.String, nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    create_time = db.Column(db.String, nullable=False)
+    title = db.Column(db.Text, unique=True, nullable=False)
+    rate = db.Column(db.String, unique=True, nullable=False)
+    url = db.Column(db.String, unique=True, nullable=False)
+    cover_url = db.Column(db.String, unique=True ,nullable=False)
+    types = db.Column(db.String, unique=True, nullable=False)
+    actors = db.Column(db.String, unique=True, nullable=False)
+    content = db.Column(db.Text, unique=True, nullable=False)
+    create_time = db.Column(db.String, unique=True, nullable=False)
 
 
 
