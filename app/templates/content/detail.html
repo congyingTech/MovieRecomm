@@ -1,10 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
 
-</body>
-</html>
+{% block title %}MovieRecomm{% endblock %}
+
+{% block page_content %}
+    <div class="page-header">
+        <h1>{{ film.title }}</h1>
+    </div>
+    <div>
+        <div class="movie-all">
+            <div class="img-all"><img src="{{ film.cover_url }}" alt="" /></div>
+
+            <div class="text-all">
+                <table border="0">
+                    <tr>
+                        <td width="250px"> <h3>Rate:</h3></td>
+                        <td><h3>Type:</h3></td>
+                    </tr>
+                    <tr>
+                        <td><p>{{ film.rate }}</></td>
+                        <td><p>{{ film.types }}</p></td>
+                    </tr>
+                </table>
+
+
+
+                <h3>Actors:</h3>
+                {% for i in actorList %}
+                    <p>{{ ' , '.join(i)}}</p>
+                {% endfor %}
+
+                <h3>Content:</h3>
+                <p>{{ film.content }}</p>
+
+                <span><b>Release Time：</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ film.create_time }}</span>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

@@ -54,7 +54,7 @@ def main():
     for i in range(0, 340, 20):
         data = {
             'type': 'movie',
-            'tag': '热门',
+            'tag': '经典',
             'sort': 'recommend',
             'page_limit': 20,
             'page_start': i
@@ -76,6 +76,7 @@ def main():
 '''
 def save_data(film):
 
+    id = film['id']
     title = film['title']
     rate = film['rate']
     url = film['url']
@@ -101,8 +102,17 @@ def save_data(film):
     with sqlite3.connect("data-dev.sqlite") as conn:
         cursor = conn.cursor()
         # 插入数据
-        insert_sql = "insert into films(title,rate,url,cover_url,types,actors,content,create_time) values('%s','%s','%s','%s','%s','%s','%s','%s')"
-        sql = insert_sql % (title,rate,url,cover_url,types,actors.replace("'","''"),content.replace("'","''"),create_time)
+        insert_sql = "insert or ignore into films(id,title,rate,url,cover_url,types,actors,content,create_time) values('%d','%s','%s','%s','%s','%s','%s','%s','%s');"
+        sql = insert_sql % (id, title, rate, url, cover_url, types, actors.replace("'", "''"), content.replace("'", "''"), create_time)
+        #update_sql = ""
+        # select_sql = "select * from films where id=%d" % id
+        # print(select_sql)
+        # result = cursor.execute(select_sql).fetchone()
+        # # if result == None:
+        #     sql = insert_sql % (id, title, rate, url, cover_url, types, actors.replace("'", "''"), content.replace("'", "''"), create_time)
+        #
+        # else:
+        #     sql =
         print(sql)
         cursor.execute(sql)
         #cursor.execute("insert into films(title,create_time,content,cover_url,download_url) values('title', 'create_time', 'content', 'cover_url', 'download_url')")
@@ -131,10 +141,11 @@ def one_page(url):
                     'title': item.get('title'), #电影名称
                     'url': item.get('url'), #电影链接
                     'cover_url': item.get('cover'), #电影封面
-                    'types':spider_page(item.get('url'))[0], #电影类型
-                    'actors': spider_page(item.get('url'))[1], #电影演员
-                    'content': spider_page(item.get('url'))[2], #电影内容
-                    'create_time': spider_page(item.get('url'))[3] #上映时间
+                    'id': spider_page(item.get('url'))[0], #电影id
+                    'types':spider_page(item.get('url'))[1], #电影类型
+                    'actors': spider_page(item.get('url'))[2], #电影演员
+                    'content': spider_page(item.get('url'))[3], #电影内容
+                    'create_time': spider_page(item.get('url'))[4] #上映时间
                 }
             result.append(film)
             print(film)
@@ -153,6 +164,9 @@ def spider_page(url):
     html = response.text
     tree = etree.HTML(html)
 
+    #电影的id
+    id = int(re.findall(r'\d+', url)[0])
+
     #电影的内容
     content = re.sub('[\r\n\t]', '', ''.join(tree.xpath('//span[@property="v:summary"]/text()')))
 
@@ -165,7 +179,7 @@ def spider_page(url):
     #上映时间
     create_time = '|'.join(tree.xpath('//span[@property="v:initialReleaseDate"]/text()'))
 
-    return [types,actors,content,create_time]
+    return [id,types,actors,content,create_time]
 
 
 
@@ -199,7 +213,7 @@ if __name__ == "__main__":
    #             "http": "115.223.215.229:9000",
    #             "http": "218.95.51.46:9000"}
 
-    # url = 'https://movie.douban.com/subject/26862829/'
+    # url = 'https://movie.douban.com/subject/26977165/'
     # response = requests.get(url, headers=headers)
     # html = response.text.encode('utf-8')
     # tree = etree.HTML(html)
@@ -214,7 +228,7 @@ if __name__ == "__main__":
     # print(actors)
     # # 上映时间
     # create_time = '|'.join(tree.xpath('//span[@property="v:initialReleaseDate"]/text()'))
-    # print(create_time)
+    #print(create_time)
     # headerss = ("User-Agent","Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36")
     # proxy = random.choice(proxys)
     # url = 'https://movie.douban.com/subject/25790761/'

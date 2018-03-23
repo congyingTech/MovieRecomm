@@ -13,7 +13,7 @@
     </div>
     <div>
     <ul>
-        {% for film in movie %}
+        {% for film in films %}
 
 
             <li >
@@ -23,9 +23,17 @@
                     <div class="text-all">
                         <p ><a href="{{ url_for('main.detail',film_id=film.id) }}">{{ film.title }}</a></p>
                         <p >{{ film.content }}</p>
-                         <span>{{ film.create_time }}</span>
+
+                            <form class="navbar-form navbar-left" action="{{ url_for('main.favorite') }}" method="get">
+                                <span class="button-position">{{ film.create_time }}</span>
+                                {% if current_user.is_authenticated %}
+                                    <button class="button-all" type="submit">Favorite</button>
+                                {% endif %}
+                            </form>
+
                     </div>
                 </div>
+
             </li>
 
 
