@@ -43,13 +43,12 @@ def index():
         page, per_page=current_app.config['MOVIE_ITEM_PER_PAGE'], error_out=False
     )
     films = pagination.items
+
     favorites = []
     if current_user.is_authenticated:
         email = current_user.email
         user = User.query.filter(User.email == email).first()
         favorites = user.favorite.all()
-        print(favorites)
-        print(len(favorites))
     return render_template('index.html', name=session.get('name'), known=session.get('known', False), current_time=datetime.utcnow(), films=films,
                            pagination =  pagination, favorites=favorites)
 
@@ -62,45 +61,49 @@ def detail(film_id):
     for i in range(lenth-1):
         actorList.append(actors[i::3])
 
-    print(film)
     return render_template('content/detail.html', film=film, actorList=actorList)
 
 @main.route('/search/', methods=['GET', 'POST'])
 def search():
     q = request.args.get('q')
-    print(q)
     films = Film.query.filter(Film.title==q.format()).all()
-    print(films)
     return render_template('index.html', films=films)
 
+#将film添加到favorite列表
 @main.route('/favorite/<film_id>', methods=['GET', 'POST'])
 def favorite(film_id):
-    print(film_id)
     email = current_user.email
-    print('here')
     user = User.query.filter(User.email == email).first()
-    print(Film.query.get(film_id))
     user.favorite.append(Film.query.get(film_id))
 
     return redirect(url_for('main.index'))
-
+#将film从favorite列表移除
 @main.route('/unfavorite/<film_id>', methods=['GET', 'POST'])
 def unfavorite(film_id):
-    print(film_id)
     email = current_user.email
-    print('here')
     user = User.query.filter(User.email == email).first()
-    print(Film.query.get(film_id))
-
     user.favorite.remove(Film.query.get(film_id))
 
     return redirect(url_for('main.index'))
 
 
+#favorite的全部电影的展示页面favorite.html
 @main.route('/content/favorite/<username>', methods=['GET', 'POST'])
-def ownmovie(username):
+def favoriteAll(username):
+    if current_user.is_authenticated:
+        email = current_user.email
+        user = User.query.filter(User.email == email).first()
+        favorites = user.favorite.all()
+    return render_template('content/favorite.html', username=username, favorites=favorites)
+#将favorite从favorite.html移除
+@main.route('/remove/<film_id>')
+def remove(film_id):
+    email = current_user.email
+    user = User.query.filter(User.email == email).first()
+    user.favorite.remove(Film.query.get(film_id))
 
-    return render_template('content/favorite.html', username=username)
+    return redirect(url_for('main.favoriteAll', username=current_user.username))
+
 @main.route('/content/recomm/<username>', methods=['GET', 'POST'])
 def recomm(username):
     return render_template('content/recomm.html',username=username)

@@ -24,7 +24,7 @@
 
                         <div class="text-all">
                             <p><a href="{{ url_for('main.detail',film_id=film.id) }}">{{ film.title }}</a></p>
-                            <p>{{ film.content }}{{ favorites }}</p>
+                            <p>{{ film.content }}</p>
 
                             <form class="navbar-form navbar-left"
                                   action="{{ url_for('main.favorite',  film_id=film.id) }}"

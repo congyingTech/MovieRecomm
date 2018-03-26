@@ -6,9 +6,41 @@
 
 {%  block page_content %}
 <div class="page-header">
-    <h1>{{ username }}</h1>
-
-
+    <h1>{{ username }},Your Favorite List</h1>
 </div>
+
+
+<div>
+        <ul>
+            {% for film in favorites %}
+
+
+                <li>
+                    <div class="movie-all">
+                        <div class="img-all"><img src="{{ film.cover_url }}" alt="" height="150px"/></div>
+
+                        <div class="text-all">
+                            <p><a href="{{ url_for('main.detail',film_id=film.id) }}">{{ film.title }}</a></p>
+                            <p>{{ film.content }}{{ favorites }}</p>
+
+                            <form class="navbar-form navbar-left" method="get">
+                                <span class="button-position">{{ film.create_time }}</span>
+                                {% if current_user.is_authenticated %}
+                                    <a href="{{ url_for('main.remove',film_id=film.id) }}">
+                                        <input class="button-all" type="button" value="UnFavorite"/>
+                                    </a>
+                                {% endif %}
+                            </form>
+
+                        </div>
+                    </div>
+
+                </li>
+
+
+            {% endfor %}
+        </ul>
+    </div>
+
 
 {% endblock %}
