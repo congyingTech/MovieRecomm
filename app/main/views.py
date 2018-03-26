@@ -6,6 +6,7 @@ from .forms import NameForm
 from .. import db
 from ..models import Film, User
 from flask_login import  current_user
+
 @main.route('/', methods=['GET', 'POST'])
 def index():
     # form = NameForm()
@@ -24,8 +25,6 @@ def index():
     # for content in contents:
     #     print(type(content))
     #     print(list(content))
-    title = ''
-    allData = Film.query.order_by(Film.title.desc()).all()
     # first_data = Film.query.first()
     # for film in allData:
     #     if film.title == '' or film.create_time =='' or film.actors =='' or film.cover_url =='' or film.url =='' or \

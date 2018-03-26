@@ -3,6 +3,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask import url_for
 
+ALL_CHOICES = [('romance', '爱情片'), ('drama', '剧情片'), ('comedy', '喜剧片'),('family','家庭片'),
+                   ('ethics', '伦理片'),('literature', '文艺片'),('music','音乐片'),('singing','歌舞片'),
+                   ('action','动作片'),('horror','恐怖片'), ('thriller','惊悚片'),('adventure','冒险片'),
+                   ('war','战争片'),('history','历史片'),('fantasy','科幻片')]
+DEFAULT_CHOICES = ['romance', 'action', 'literature']
+
+
+
 
 user_film = db.Table('user_film',
             db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
@@ -20,7 +28,25 @@ class User(UserMixin, db.Model):
     favorite = db.relationship('Film',secondary=user_film,
                                     backref=db.backref('users', lazy='dynamic'),
                                     lazy='dynamic')   #这是注册用户喜欢的电影id
-    #movieContent = db.Column(db.Text()) #这是注册用户下的电影信息
+    #生成虚拟数据
+    @staticmethod
+    def generate_fake(count=300):
+        from sqlalchemy.exc import IntegrityError
+        from random import seed
+        import forgery_py
+
+
+        seed()
+        for i in range(count):
+            u = User(email=forgery_py.internet.email_address(),
+                     username=forgery_py.internet.user_name(True),
+                     password_hash=forgery_py.lorem_ipsum.word(),
+
+
+
+
+                     )
+
 
 
     def __repr__(self):
