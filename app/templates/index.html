@@ -7,60 +7,72 @@
 {% block page_content %}
     <div class="page-header">
         <h1>Hello, {% if current_user.is_authenticated %}
-                      {{ current_user.username }}
-                      Your like {{ current_user.moviePrefer}}
-                   {% else %}Stranger{% endif %}!</h1>
+            {{ current_user.username }}
+            Your like {{ current_user.moviePrefer }}
+        {% else %}Stranger{% endif %}!
+
+        </h1>
     </div>
     <div>
-    <ul>
-        {% for film in films %}
+        <ul>
+            {% for film in films %}
 
 
-            <li >
-                <div class="movie-all">
-                    <div class="img-all" ><img  src="{{ film.cover_url }}" alt="" height="150px"/></div>
+                <li>
+                    <div class="movie-all">
+                        <div class="img-all"><img src="{{ film.cover_url }}" alt="" height="150px"/></div>
 
-                    <div class="text-all">
-                        <p ><a href="{{ url_for('main.detail',film_id=film.id) }}">{{ film.title }}</a></p>
-                        <p >{{ film.content }}</p>
+                        <div class="text-all">
+                            <p><a href="{{ url_for('main.detail',film_id=film.id) }}">{{ film.title }}</a></p>
+                            <p>{{ film.content }}{{ favorites }}</p>
 
-                            <form class="navbar-form navbar-left" action="{{ url_for('main.favorite') }}" method="get">
+                            <form class="navbar-form navbar-left"
+                                  action="{{ url_for('main.favorite',  film_id=film.id) }}"
+                                  method="get">
                                 <span class="button-position">{{ film.create_time }}</span>
                                 {% if current_user.is_authenticated %}
-                                    <button class="button-all" type="submit">Favorite</button>
+                                    {% if film in favorites %}
+                                        <a href="{{ url_for('main.unfavorite',film_id=film.id) }}">
+                                            <input class="button-all" type="button" value="UnFavorite"/>
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ url_for('main.favorite',film_id=film.id) }}">
+                                            <input class="button-all" type="button" value="Favorite"/>
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
                             </form>
 
+                        </div>
                     </div>
-                </div>
 
-            </li>
+                </li>
 
 
-        {% endfor %}
-    </ul>
+            {% endfor %}
+        </ul>
     </div>
 
 
-{#<div>#}
-{#    {% if current_user.can(Permission.WRITE) %}#}
-{#    {{ wtf.quick_form(form) }}#}
-{#    {% endif %}#}
-{#</div>#}
-{#<div class="post-tabs">#}
-{#    <ul class="nav nav-tabs">#}
-{#        <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_all') }}">All</a></li>#}
-{#        {% if current_user.is_authenticated %}#}
-{#        <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_followed') }}">Followers</a></li>#}
-{#        {% endif %}#}
-{#    </ul>#}
-{#    {% include '_posts.html' %}#}
-{#</div>#}
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, '.index') }}
-</div>
-{% endif %}
+    {#<div>#}
+    {#    {% if current_user.can(Permission.WRITE) %}#}
+    {#    {{ wtf.quick_form(form) }}#}
+    {#    {% endif %}#}
+    {#</div>#}
+    {#<div class="post-tabs">#}
+    {#    <ul class="nav nav-tabs">#}
+    {#        <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_all') }}">All</a></li>#}
+    {#        {% if current_user.is_authenticated %}#}
+    {#        <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_followed') }}">Followers</a></li>#}
+    {#        {% endif %}#}
+    {#    </ul>#}
+    {#    {% include '_posts.html' %}#}
+    {#</div>#}
+    {% if pagination %}
+        <div class="pagination">
+            {{ macros.pagination_widget(pagination, '.index') }}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {#{% block scripts %}#}

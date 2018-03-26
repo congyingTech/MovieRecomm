@@ -4,6 +4,12 @@ from flask_login import UserMixin
 from flask import url_for
 
 
+user_film = db.Table('user_film',
+            db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+            db.Column('film_id', db.Integer, db.ForeignKey('films.id'))
+                     )
+
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -11,7 +17,9 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128)) #经过散列的密码
     moviePrefer = db.Column(db.Text(64)) #这是注册用户时需要添加的电影偏好标签
-
+    favorite = db.relationship('Film',secondary=user_film,
+                                    backref=db.backref('users', lazy='dynamic'),
+                                    lazy='dynamic')   #这是注册用户喜欢的电影id
     #movieContent = db.Column(db.Text()) #这是注册用户下的电影信息
 
 

@@ -4,15 +4,18 @@ from flask import render_template, session, redirect, url_for, abort, request,cu
 from . import main
 from .forms import NameForm
 from .. import db
-from ..models import Film
-
+from ..models import Film, User
+from flask_login import  current_user
 @main.route('/', methods=['GET', 'POST'])
 def index():
-    form = NameForm()
-    if form.validate_on_submit():
-        name = form.name.data
-        form.name.data = ''
-        return redirect(url_for('.index'))
+    # form = NameForm()
+    # name = form.name.data
+    # print(name)
+    # if form.validate_on_submit():
+    #
+    #
+    #     form.name.data = ''
+    #     return redirect(url_for('.index'))
     # #context将数据传入前台
     # context = {
     #     'films':Film.query.all()
@@ -36,13 +39,19 @@ def index():
     movie_data = Film.query.order_by(Film.create_time.desc(), Film.rate.desc())
     #movie_title = db.session.query(Film.title).distinct().all()
         #movie = Film.query.filter_by(title==title).order_by(Film.create_time.desc()).first()
-
     pagination = movie_data.paginate(
         page, per_page=current_app.config['MOVIE_ITEM_PER_PAGE'], error_out=False
     )
     films = pagination.items
-    return render_template('index.html', form=form, name=session.get('name'), known=session.get('known', False), current_time=datetime.utcnow(), films=films,
-                           pagination =  pagination)
+    favorites = []
+    if current_user.is_authenticated:
+        email = current_user.email
+        user = User.query.filter(User.email == email).first()
+        favorites = user.favorite.all()
+        print(favorites)
+        print(len(favorites))
+    return render_template('index.html', name=session.get('name'), known=session.get('known', False), current_time=datetime.utcnow(), films=films,
+                           pagination =  pagination, favorites=favorites)
 
 @main.route('/content/detail/<film_id>', methods=['GET', 'POST'])
 def detail(film_id):
@@ -64,14 +73,34 @@ def search():
     print(films)
     return render_template('index.html', films=films)
 
-@main.route('/favorite', methods=['GET', 'POST'])
-def favorite():
-    pass
+@main.route('/favorite/<film_id>', methods=['GET', 'POST'])
+def favorite(film_id):
+    print(film_id)
+    email = current_user.email
+    print('here')
+    user = User.query.filter(User.email == email).first()
+    print(Film.query.get(film_id))
+    user.favorite.append(Film.query.get(film_id))
+
+    return redirect(url_for('main.index'))
+
+@main.route('/unfavorite/<film_id>', methods=['GET', 'POST'])
+def unfavorite(film_id):
+    print(film_id)
+    email = current_user.email
+    print('here')
+    user = User.query.filter(User.email == email).first()
+    print(Film.query.get(film_id))
+
+    user.favorite.remove(Film.query.get(film_id))
+
+    return redirect(url_for('main.index'))
 
 
-@main.route('/content/ownmovie/<username>', methods=['GET', 'POST'])
+@main.route('/content/favorite/<username>', methods=['GET', 'POST'])
 def ownmovie(username):
-    return render_template('content/ownmovie.html', username=username)
+
+    return render_template('content/favorite.html', username=username)
 @main.route('/content/recomm/<username>', methods=['GET', 'POST'])
 def recomm(username):
     return render_template('content/recomm.html',username=username)
