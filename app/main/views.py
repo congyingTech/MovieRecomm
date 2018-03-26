@@ -21,6 +21,7 @@ def index():
     # context = {
     #     'films':Film.query.all()
     # }
+
     #contents = Film.query.with_entities(Film.content).all()
     # for content in contents:
     #     print(type(content))
@@ -43,11 +44,15 @@ def index():
     )
     films = pagination.items
 
+    all_films = Film.query.all()
+    print(all_films)
+
     favorites = []
     if current_user.is_authenticated:
         email = current_user.email
         user = User.query.filter(User.email == email).first()
         favorites = user.favorite.all()
+        print(favorites)
     return render_template('index.html', name=session.get('name'), known=session.get('known', False), current_time=datetime.utcnow(), films=films,
                            pagination =  pagination, favorites=favorites)
 
@@ -93,6 +98,8 @@ def favoriteAll(username):
         email = current_user.email
         user = User.query.filter(User.email == email).first()
         favorites = user.favorite.all()
+
+
     return render_template('content/favorite.html', username=username, favorites=favorites)
 #将favorite从favorite.html移除
 @main.route('/remove/<film_id>')
@@ -106,3 +113,18 @@ def remove(film_id):
 @main.route('/content/recomm/<username>', methods=['GET', 'POST'])
 def recomm(username):
     return render_template('content/recomm.html',username=username)
+
+
+def getAllTypes():
+    all_types = Film.query.with_entities(Film.types).all()
+    type_list = []
+    type_list1 = []
+    for i, film in enumerate(all_types):
+        type_list.extend(list(film))
+        type_list1.extend(i for i in type_list[i].split(',') if i != '')
+    type_list = list(set(type_list1))
+    return type_list
+
+def getAllFilms():
+    all_films = Film.query.all()
+    return all_films

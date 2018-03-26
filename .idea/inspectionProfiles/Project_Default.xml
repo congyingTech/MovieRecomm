@@ -5,6 +5,7 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="MovieRecomm.flask_mail" />
+          <option value="app.main.Film" />
         </list>
       </option>
     </inspection_tool>

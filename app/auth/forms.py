@@ -3,11 +3,19 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField,Select
 from wtforms.validators import DataRequired, Length, Email, Regexp, EqualTo
 from ..models import User
 
-ALL_CHOICES = [('romance', '爱情片'), ('drama', '剧情片'), ('comedy', '喜剧片'),('family','家庭片'),
-                   ('ethics', '伦理片'),('literature', '文艺片'),('music','音乐片'),('singing','歌舞片'),
-                   ('action','动作片'),('horror','恐怖片'), ('thriller','惊悚片'),('adventure','冒险片'),
-                   ('war','战争片'),('history','历史片'),('fantasy','科幻片')]
-DEFAULT_CHOICES = ['romance', 'action', 'literature']
+# ALL_CHOICES = [('romance', '爱情片'), ('drama', '剧情片'), ('comedy', '喜剧片'),('family','家庭片'),
+#                    ('ethics', '伦理片'),('literature', '文艺片'),('music','音乐片'),('singing','歌舞片'),
+#                    ('action','动作片'),('horror','恐怖片'), ('thriller','惊悚片'),('adventure','冒险片'),
+#                    ('war','战争片'),('history','历史片'),('fantasy','科幻片')]
+# DEFAULT_CHOICES = ['romance', 'action', 'literature']
+
+ALL_CHOICES = [('古装','古装'), ('黑色电影','黑色电影'), ('悬疑','悬疑'), ('动画','动画'), ('科幻','科幻'), ('家庭','家庭'),
+               ('惊悚','惊悚'), ('情色','情色'), ('音乐','音乐'), ('武侠','武侠'), ('运动','运动'), ('灾难','灾难'), ('历史','历史'), \
+               ('冒险','冒险'), ('战争','战争'), ('歌舞','歌舞'), ('恐怖','恐怖'), ('传记','传记'), ('犯罪','犯罪'), ('爱情','爱情'),\
+               ('剧情','剧情'), ('西部','西部'), ('同性','同性'), ('动作','动作'), ('奇幻','奇幻'), ('喜剧','喜剧'), ('儿童','儿童')]
+
+DEFAULT_CHOICES = ['爱情', '动作', '科幻']
+
 
 class LoginForm(FlaskForm): #用户登录表单
     email = StringField('Email', validators=[DataRequired(), Length(1, 64), Email()])

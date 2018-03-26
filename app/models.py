@@ -2,12 +2,14 @@ from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask import url_for
+# ALL_CHOICES = [('romance', '爱情片'), ('drama', '剧情片'), ('comedy', '喜剧片'),('family','家庭片'),
+#                    ('ethics', '伦理片'),('literature', '文艺片'),('music','音乐片'),('singing','歌舞片'),
+#                    ('action','动作片'),('horror','恐怖片'), ('thriller','惊悚片'),('adventure','冒险片'),
+#                    ('war','战争片'),('history','历史片'),('fantasy','科幻片')]
+ALL_CHOICES = ['古装', '黑色电影', '悬疑', '动画', '科幻', '家庭', '惊悚', '情色', '音乐', '武侠', '运动', '灾难', '历史', \
+               '冒险', '战争', '歌舞', '恐怖', '传记', '犯罪', '爱情', '剧情', '西部', '同性', '动作', '奇幻', '喜剧', '儿童']
 
-ALL_CHOICES = [('romance', '爱情片'), ('drama', '剧情片'), ('comedy', '喜剧片'),('family','家庭片'),
-                   ('ethics', '伦理片'),('literature', '文艺片'),('music','音乐片'),('singing','歌舞片'),
-                   ('action','动作片'),('horror','恐怖片'), ('thriller','惊悚片'),('adventure','冒险片'),
-                   ('war','战争片'),('history','历史片'),('fantasy','科幻片')]
-DEFAULT_CHOICES = ['romance', 'action', 'literature']
+DEFAULT_CHOICES = ['爱情', '动作', '科幻']
 
 
 
@@ -34,18 +36,22 @@ class User(UserMixin, db.Model):
         from sqlalchemy.exc import IntegrityError
         from random import seed
         import forgery_py
-
+        maxPreferNum = 6; maxFavoriteNum = 840
+        import random
+        preferNum= random.choice(range(1, maxPreferNum+1))
+        favoriteNum = random.choice(range(1, maxFavoriteNum))
 
         seed()
         for i in range(count):
+            print('hereewe')
+            favorite = random.sample(Film.getAllFilms(), favoriteNum)
+            print(favorite)
             u = User(email=forgery_py.internet.email_address(),
                      username=forgery_py.internet.user_name(True),
                      password_hash=forgery_py.lorem_ipsum.word(),
-
-
-
-
-                     )
+                     moviePrefer=str(random.sample(ALL_CHOICES, preferNum)),
+                     favorite= random.sample(Film.getAllFilms(), favoriteNum)
+                )
 
 
 
@@ -83,6 +89,11 @@ class Film(db.Model):
     actors = db.Column(db.String,  nullable=False)
     content = db.Column(db.Text, nullable=False)
     create_time = db.Column(db.String,  nullable=False)
+
+    @staticmethod
+    def getAllFilms():
+        all_films = Film.query.all()
+        return all_films
 
 
 
