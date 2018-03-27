@@ -92,7 +92,7 @@ class Film(db.Model):
 
     @staticmethod
     def getAllFilms():
-        all_films = Film.query.all()
+        all_films = Film.query.with_entities(Film.id).all()
         return all_films
 
 
