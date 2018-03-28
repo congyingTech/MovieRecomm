@@ -2,22 +2,34 @@ from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask import url_for
+from sqlalchemy.exc import IntegrityError
+import sqlite3
 # ALL_CHOICES = [('romance', '爱情片'), ('drama', '剧情片'), ('comedy', '喜剧片'),('family','家庭片'),
 #                    ('ethics', '伦理片'),('literature', '文艺片'),('music','音乐片'),('singing','歌舞片'),
 #                    ('action','动作片'),('horror','恐怖片'), ('thriller','惊悚片'),('adventure','冒险片'),
 #                    ('war','战争片'),('history','历史片'),('fantasy','科幻片')]
 ALL_CHOICES = ['古装', '黑色电影', '悬疑', '动画', '科幻', '家庭', '惊悚', '情色', '音乐', '武侠', '运动', '灾难', '历史', \
                '冒险', '战争', '歌舞', '恐怖', '传记', '犯罪', '爱情', '剧情', '西部', '同性', '动作', '奇幻', '喜剧', '儿童']
-
 DEFAULT_CHOICES = ['爱情', '动作', '科幻']
-
-
-
 
 user_film = db.Table('user_film',
             db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
             db.Column('film_id', db.Integer, db.ForeignKey('films.id'))
                      )
+
+#所有爬取Film的数据库表
+class Film(db.Model):
+    __tablename__ = 'films'
+    #title,rate,url,cover_url,types,actors,content,create_time
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.Text,  nullable=False)
+    rate = db.Column(db.String, nullable=False)
+    url = db.Column(db.String,  nullable=False)
+    cover_url = db.Column(db.String, nullable=False)
+    types = db.Column(db.String,  nullable=False)
+    actors = db.Column(db.String,  nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    create_time = db.Column(db.String,  nullable=False)
 
 
 class User(UserMixin, db.Model):
@@ -30,30 +42,55 @@ class User(UserMixin, db.Model):
     favorite = db.relationship('Film',secondary=user_film,
                                     backref=db.backref('users', lazy='dynamic'),
                                     lazy='dynamic')   #这是注册用户喜欢的电影id
-    #生成虚拟数据
+    #生成user的虚拟数据
     @staticmethod
-    def generate_fake(count=300):
+    def generate_fake_user(count=10):
         from sqlalchemy.exc import IntegrityError
-        from random import seed
+        #from random import seed
         import forgery_py
-        maxPreferNum = 6; maxFavoriteNum = 840
-        import random
-        preferNum= random.choice(range(1, maxPreferNum+1))
-        favoriteNum = random.choice(range(1, maxFavoriteNum))
-
-        seed()
+        maxPreferNum = 6 #maxFavoriteNum = 840
+        #seed() 会把随机数固定下来
         for i in range(count):
-            print('hereewe')
-            favorite = random.sample(Film.getAllFilms(), favoriteNum)
-            print(favorite)
+            import random
+            preferNum = random.choice(range(1, maxPreferNum + 1))
             u = User(email=forgery_py.internet.email_address(),
                      username=forgery_py.internet.user_name(True),
-                     password_hash=forgery_py.lorem_ipsum.word(),
-                     moviePrefer=str(random.sample(ALL_CHOICES, preferNum)),
-                     favorite= random.sample(Film.getAllFilms(), favoriteNum)
+                     password='password',
+                     moviePrefer=str(random.sample(ALL_CHOICES, preferNum))
                 )
+            db.session.add(u)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
 
+    #生成favorite的虚拟数据
+    @staticmethod
+    def generate_fake_favorite():
+        maxFavoriteNum = 840;
+        user_count = User.query.count()
+        import random
+        with sqlite3.connect("data-dev.sqlite") as conn:
+            cursor = conn.cursor()
+            insert_sql = "insert  into user_film(user_id,film_id) values('%d','%d');"
+            for i in range(1, user_count + 1):
+                favoriteNum = random.choice(range(1, maxFavoriteNum + 1))
+                favorite = random.sample(User.get_allFilmId(), favoriteNum)
+                for j in favorite:
+                    ids = j[0]
+                    sql = insert_sql % (i, ids)
+                    cursor.execute(sql)
+                    conn.commit()
 
+    @staticmethod
+    def get_allFilmId():
+        all_films = Film.query.with_entities(Film.id).all()
+        return all_films
+
+    @staticmethod
+    def test():
+
+        return User.query.all()
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -76,24 +113,12 @@ class User(UserMixin, db.Model):
         return User.query.get(int(user_id))
 
 
-#所有爬取Film的数据库表
-class Film(db.Model):
-    __tablename__ = 'films'
-    #title,rate,url,cover_url,types,actors,content,create_time
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text,  nullable=False)
-    rate = db.Column(db.String, nullable=False)
-    url = db.Column(db.String,  nullable=False)
-    cover_url = db.Column(db.String, nullable=False)
-    types = db.Column(db.String,  nullable=False)
-    actors = db.Column(db.String,  nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    create_time = db.Column(db.String,  nullable=False)
 
-    @staticmethod
-    def getAllFilms():
-        all_films = Film.query.with_entities(Film.id).all()
-        return all_films
+
+    # @staticmethod
+    # def getAllFilms():
+    #     all_films = Film.query.with_entities(Film.id).all()
+    #     return all_films
 
 
 

@@ -45,14 +45,12 @@ def index():
     films = pagination.items
 
     all_films = Film.query.all()
-    print(all_films)
 
     favorites = []
     if current_user.is_authenticated:
         email = current_user.email
         user = User.query.filter(User.email == email).first()
         favorites = user.favorite.all()
-        print(favorites)
     return render_template('index.html', name=session.get('name'), known=session.get('known', False), current_time=datetime.utcnow(), films=films,
                            pagination =  pagination, favorites=favorites)
 
